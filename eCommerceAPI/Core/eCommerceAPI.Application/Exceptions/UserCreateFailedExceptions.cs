@@ -2,7 +2,7 @@ namespace eCommerceAPI.Application.Exceptions;
 
 public class UserCreateFailedExceptions : Exception
 {
-     public UserCreateFailedExceptions() : base("User create failed")
+     public UserCreateFailedExceptions() : base("User create failed.")
      {
           
      }

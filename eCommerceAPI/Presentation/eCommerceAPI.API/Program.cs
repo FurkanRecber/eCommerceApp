@@ -1,3 +1,4 @@
+using System.Text;
 using eCommerceAPI.Application;
 using eCommerceAPI.Application.Validators.Products;
 using eCommerceAPI.Infrastructure;
@@ -7,11 +8,14 @@ using eCommerceAPI.Infrastructure.Services.Storage.Local;
 using eCommerceAPI.Persistence;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddPersistenceServices();      // IoC Container'a ne eklenirse çalışacak çünkü bu komutla çağrılıyor
+builder.Services.AddPersistenceServices();      // IoC Container'a ne eklenirse ï¿½alï¿½ï¿½acak ï¿½ï¿½nkï¿½ bu komutla ï¿½aï¿½rï¿½lï¿½yor
 builder.Services.AddInfrastructureServices();   // Add infrastructure services
 builder.Services.AddApplicationServices();
 
@@ -32,17 +36,33 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ValidationFilter>();
 })
 .ConfigureApiBehaviorOptions(options =>
-{
+{  
     options.SuppressModelStateInvalidFilter = true;
 });
-builder.Services.AddFluentValidationAutoValidation(); // FluentValidation'ın otomatik doğrulama özelliğini ekler
-builder.Services.AddFluentValidationClientsideAdapters(); // FluentValidation için istemci tarafı adaptörlerini ekler
+builder.Services.AddFluentValidationAutoValidation(); // FluentValidation'ï¿½n otomatik doï¿½rulama ï¿½zelliï¿½ini ekler
+builder.Services.AddFluentValidationClientsideAdapters(); // FluentValidation iï¿½in istemci tarafï¿½ adaptï¿½rlerini ekler
 builder.Services.AddValidatorsFromAssemblyContaining<CreateProductValidator>(); // Register validators from the assembly containing CreateProductValidator
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); 
 
-var app = builder.Build();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer("Admin",options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuerSigningKey = true, // OluÅŸturulacak token deÄŸerinin uygulamamÄ±za ait bir deÄŸer olduÄŸunu ifade eden securit y key verisinin doÄŸrulanmasÄ±dÄ±r 
+            ValidateAudience = true, // OluÅŸturulacak token deÄŸerini kimlerin/hangi sitelerin/originlerin kullanacaÄŸÄ±nÄ± belirlediÄŸimiz deÄŸerlerdir
+            ValidateLifetime = true, // OluÅŸturulan token deÄŸerinin sÃ¼resini kontrol edecek doÄŸrulamadÄ±r 
+            ValidateIssuer = true, // OluÅŸturulacak token deÄŸerini kimin daÄŸÄ±ttÄ±ÄŸÄ±nÄ± ifade edeceÄŸimiz alandÄ±r  
+            
+            ValidAudience = builder.Configuration["Jwt:Audience"],   
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecurityKey"]))
+        };
+    });  
+ 
+var app = builder.Build(); 
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -50,13 +70,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+  
+app.UseStaticFiles(); // Statik dosyalarÄ± kullanmak iï¿½in
 
-app.UseStaticFiles(); // Statik dosyaları kullanmak için
-
-app.UseCors("AllowAllOrigins"); // CORS politikasını uygulamak için
+app.UseCors("AllowAllOrigins"); // CORS politikasÄ±nÄ± uygulamak iÃ§in
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication(); // Yetki iÃ§in bunu eklemeyi unutma
 app.UseAuthorization();
 
 app.MapControllers();

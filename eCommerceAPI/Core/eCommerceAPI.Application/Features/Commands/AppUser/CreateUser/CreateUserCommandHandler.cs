@@ -32,7 +32,7 @@ public class CreateUserCommandHandler : IRequestHandler<CreateUserCommandRequest
         {
             foreach (var error in result.Errors)
             {
-                response.Message += $"{error.Code} - {error.Description}\n";
+                response.Message += $"{error.Code} - {error.Description}\n ";
             }
         }
         return response;

@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eCommerceAPI.Application.Abstractions.Token;
+using eCommerceAPI.Infrastructure.Services.Token;
 
 namespace eCommerceAPI.Infrastructure
 {
@@ -19,9 +21,10 @@ namespace eCommerceAPI.Infrastructure
         public static void AddInfrastructureServices(this IServiceCollection services)
         {
             services.AddScoped<IStorageService, StorageService>();
+            services.AddScoped<ITokenHandler, TokenHandler>();
         }
 
-        public static void AddStorage<T>(this IServiceCollection services) where T : Storage, IStorage
+        public static void AddStorage<T>(this IServiceCollection  services) where T : Storage, IStorage
         {
             services.AddScoped<IStorage, T>();
         }
