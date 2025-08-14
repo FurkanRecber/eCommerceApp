@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { User } from '../../../entities/user';
+import { UserService } from '../../../services/common/models/user.service';
+import { Create_User } from '../../../contracts/users/create_user';
+import { CustomToastrService, ToastrMessageType, ToastrPosition } from '../../../services/ui/custom-toastr.service';
 
 @Component({
   selector: 'app-register',
@@ -9,7 +12,7 @@ import { User } from '../../../entities/user';
   styleUrl: './register.component.scss'
 }) 
 export class RegisterComponent implements OnInit {
-  constructor(private formBuilder: FormBuilder) {}
+  constructor(private formBuilder: FormBuilder, private userService : UserService, private toastService : CustomToastrService) {}
   
   frm : FormGroup;
   
@@ -39,15 +42,15 @@ export class RegisterComponent implements OnInit {
         Validators.required,
         Validators.minLength(6),
         Validators.maxLength(20),
-        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$') // At least one lowercase, one uppercase, and one digit
-        ]
+        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d])\\S{6,20}$')
+      ]
       ],
       confirmPassword: ['', [
         Validators.required,
         Validators.minLength(6),
         Validators.maxLength(20),
-        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$') // Same pattern as password
-        ]
+        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^a-zA-Z\\d])\\S{6,20}$')
+      ]
       ]
     }, { validators: passwordMatchValidator('password', 'confirmPassword') });
   }
@@ -56,8 +59,19 @@ export class RegisterComponent implements OnInit {
     return this.frm.controls;
   }
 
-  onSubmit(data: User) {
-    
+  async onSubmit(user: User) {
+    const result: Create_User = await this.userService.create(user);
+    if (result.succeeded) {
+      this.toastService.message(result.message, 'User created successfully!',{
+        messageType: ToastrMessageType.Success,
+        position: ToastrPosition.TopRight
+      });
+    } else {
+      this.toastService.message(result.message, 'User creation failed!', {
+        messageType: ToastrMessageType.Error,
+        position: ToastrPosition.TopRight
+      });
+    }
   }
 }
 

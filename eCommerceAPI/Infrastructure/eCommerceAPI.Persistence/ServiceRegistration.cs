@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using eCommerceAPI.Application.Repositories;
+using eCommerceAPI.Domain.Identity;
 using eCommerceAPI.Persistence.Repositories;
 
 namespace eCommerceAPI.Persistence
@@ -16,6 +17,7 @@ namespace eCommerceAPI.Persistence
         public static void AddPersistenceServices(this IServiceCollection services)
         {
             services.AddDbContext<eCommerceAPIDbContext>(options => options.UseNpgsql(Configuration.ConnectionString));
+            services.AddIdentity<AppUser,AppRole>().AddEntityFrameworkStores<eCommerceAPIDbContext>();  
             services.AddScoped<ICustomerReadRepositories, CustomerReadRepository>();    //DbContext Scoped kullandığı için burada scoped kullandık. İlerde hata almamak için.
             services.AddScoped<ICustomerWriteRepositories, CustomerWriteRepository>();
             services.AddScoped<IOrderReadRepositories, OrderReadRepository>();

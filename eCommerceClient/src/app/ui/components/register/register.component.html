@@ -41,7 +41,7 @@
                     <span *ngIf="frm.get('password').errors?.['minlength']">Password must be at least 6 characters long.</span>
                     <span *ngIf="frm.get('password').errors?.['maxlength']">Password cannot exceed 20 characters.</span>
                     <span *ngIf="frm.get('password').errors?.['pattern']">
-                        Password must contain at least one uppercase letter, one lowercase letter, and one number.
+                        Password must contain at least one uppercase letter, one lowercase letter, one special character, and one number.
                     </span>
                 </small>
 

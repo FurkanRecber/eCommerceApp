@@ -1,15 +1,12 @@
 ﻿using eCommerceAPI.Domain.Entities;
 using eCommerceAPI.Domain.Entities.Common;
+using eCommerceAPI.Domain.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace eCommerceAPI.Persistence.Contexts
 {
-    public class eCommerceAPIDbContext : DbContext                                               //Veritabanının kod karşılığını bu sınıfa yazarız
+    public class eCommerceAPIDbContext : IdentityDbContext<AppUser, AppRole, string>                                               //Veritabanının kod karşılığını bu sınıfa yazarız
     {
         public eCommerceAPIDbContext(DbContextOptions options) : base(options)
         {
