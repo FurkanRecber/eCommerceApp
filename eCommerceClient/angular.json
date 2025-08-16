@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "eTicaretClient": {
+    "eCommerceClient": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -24,7 +24,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/e-ticaret-client",
+            "outputPath": "dist/e-commerce-client",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -83,10 +83,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "eTicaretClient:build:production"
+              "buildTarget": "eCommerceClient:build:production"
             },
             "development": {
-              "buildTarget": "eTicaretClient:build:development"
+              "buildTarget": "eCommerceClient:build:development"
             }
           },
           "defaultConfiguration": "development"

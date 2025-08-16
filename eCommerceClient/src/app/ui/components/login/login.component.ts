@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../services/common/models/user.service';
 import { BaseComponent, SpinnerType } from '../../../base/base.component';
 import { NgxSpinnerService } from 'ngx-spinner';
+import { AuthService } from '../../../services/common/auth.service';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -11,14 +13,25 @@ import { NgxSpinnerService } from 'ngx-spinner';
 })
 export class LoginComponent extends BaseComponent implements OnInit {
 
-  constructor(private userService: UserService, spinner : NgxSpinnerService) { super(spinner ); }
+  constructor(private userService: UserService, spinner : NgxSpinnerService, private authService : AuthService, private activatedRoute : ActivatedRoute, private router : Router) { super(spinner ); }
  
   ngOnInit(): void {
   }
 
   async login(usernameOrEmail: string, password: string){
     this.showSpinner(SpinnerType.SquareJellyBox);
-    await this.userService.login(usernameOrEmail, password, () => this.hideSpinner(SpinnerType.SquareJellyBox));  
+    await this.userService.login(usernameOrEmail, password, () => {
+      this.authService.identityCheck();
+      
+      this.activatedRoute.queryParams.subscribe(params => {
+        const returnUrl = params['returnUrl'];
+        if (returnUrl) {
+          this.router.navigateByUrl(returnUrl);
+        }
+      });
+      
+      this.hideSpinner(SpinnerType.SquareJellyBox)
+    });  
   } 
 }
   

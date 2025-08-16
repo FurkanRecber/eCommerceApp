@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CustomToastrService, ToastrMessageType, ToastrPosition } from './services/ui/custom-toastr.service';
+import { AuthService } from './services/common/auth.service';
+import { Router } from '@angular/router';
 declare var $: any; // jQuery
 
 
@@ -10,9 +12,18 @@ declare var $: any; // jQuery
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'eTicaretClient';
-  constructor(private customToastrService: CustomToastrService) {
-    this.customToastrService.message("Welcome to eTicaretClient!", "Welcome", {messageType: ToastrMessageType.Info, position: ToastrPosition.TopLeft});
+  title = 'eCommerceClient';
+  constructor(private customToastrService: CustomToastrService, public authService: AuthService, private router: Router) {
+    this.customToastrService.message("Welcome to eCommerceClient!", "Welcome", {messageType: ToastrMessageType.Info, position: ToastrPosition.TopLeft});
+    authService.identityCheck(); // Check authentication status on app initialization
+  }
+  // Kullanıcı çıkış yapma fonksiyonu
+  // Bu fonksiyon, kullanıcıyı oturumdan çıkartır ve gerekli güncellemeleri yapar
+  signOut() {
+    localStorage.removeItem("accessToken");
+    this.authService.identityCheck(); // Update authentication status after sign out
+    this.router.navigate(['']); // Redirect to home page
+    this.customToastrService.message("You have been signed out.", "Sign Out", {messageType: ToastrMessageType.Info, position: ToastrPosition.TopRight});
   }
 }
 /*
